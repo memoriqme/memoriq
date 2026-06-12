@@ -5,7 +5,6 @@
     <section class="auth-card">
       <p class="eyebrow">Welcome back</p>
       <h1>Log in to your AI memory</h1>
-      <p class="auth-subtitle">Use your existing Memoriq account to open the dashboard preview.</p>
 
       <form @submit.prevent="submit">
         <label class="form-field">
