@@ -5,7 +5,6 @@
     <section class="auth-card">
       <p class="eyebrow">Create account</p>
       <h1>Start your Memoriq vault</h1>
-      <p class="auth-subtitle">Registration uses the existing Laravel account system.</p>
 
       <form @submit.prevent="submit">
         <label class="form-field">
