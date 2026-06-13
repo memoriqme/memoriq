@@ -1,5 +1,11 @@
 export const GITHUB_URL = 'https://github.com/memoriqme';
 
+export const X_URL = 'https://x.com/memoriqme';
+
+export const INSTAGRAM_URL = 'https://instagram.com/memoriqme';
+
+export const BLUESKY_URL = 'https://bsky.app/profile/memoriq.bsky.social';
+
 export const GITHUB_EXTENSION_URL = `${GITHUB_URL}/memoriq-extension`;
 
 export const CHROME_EXTENSION_URL =
