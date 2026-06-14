@@ -213,3 +213,11 @@ Please do not open public issues for security vulnerabilities. Use [GitHub priva
 Memoriq is licensed under the GNU Affero General Public License v3.0 only. See [`LICENSE`](LICENSE).
 
 In short: personal use, self-hosting, studying, modifying, and sharing are allowed. If you modify Memoriq and run it as a network service for others, your modified source code must remain available under the same license.
+
+## Screenshots
+
+![Landing page](public/img/screenshot-1.png)
+
+![Dashboard view](public/img/screenshot-2.png)
+
+![Mobile views](public/img/screenshot-3.png)
