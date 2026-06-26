@@ -211,7 +211,7 @@
         <div class="steps">
           <article class="step">
             <div class="step-num">01</div>
-            <h3>Install the Chrome extension</h3>
+            <h3>Install the browser extension</h3>
             <p>Add the Memoriq extension to capture chats from ChatGPT, Claude, Gemini, and Grok in one click - or import conversation exports manually.</p>
           </article>
           <article class="step">
@@ -230,7 +230,7 @@
           variant="card"
           eyebrow="Fastest way to save"
           title="Capture chats as you go"
-          description="Install the free Chrome extension, sign in once, and save any conversation from ChatGPT, Claude, Gemini, or Grok without leaving the page."
+          description="Install the free browser extension for Chrome or Firefox, sign in once, and save any conversation from ChatGPT, Claude, Gemini, or Grok without leaving the page."
         />
       </div>
     </section>
@@ -282,7 +282,7 @@
             <p class="section-label">Open source</p>
             <h2 class="section-title opensource-title">Open source. Inspect everything. Run it yourself.</h2>
             <p class="opensource-lead">
-              Memoriq is AGPL-licensed open source software. Self-host the full app and Chrome extension on your own machine - unlimited storage, every feature, under your control.
+              Memoriq is AGPL-licensed open source software. Self-host the full app and browser extension on your own machine - unlimited storage, every feature, under your control.
             </p>
             <p class="opensource-lead">
               Don't trust our E2EE claims - verify them. Client-side crypto, server storage, and the browser extension are all on GitHub for anyone to audit.
@@ -332,7 +332,7 @@
             <ul class="feature-list">
               <li>Managed vault - no server setup</li>
               <li>End-to-end encrypted - we can't read your archives</li>
-              <li>Chrome extension for one-click capture</li>
+              <li>Browser extension for one-click capture (Chrome &amp; Firefox)</li>
               <li>Import from ChatGPT, Claude, Gemini, and Grok</li>
               <li>Export or delete anytime</li>
             </ul>
@@ -350,7 +350,7 @@
             <ul class="feature-list">
               <li>Unlimited storage on your hardware</li>
               <li>Your server, your backups</li>
-              <li>Chrome extension works with your instance</li>
+              <li>Browser extension works with your instance</li>
               <li>Audit E2EE claims - all source on GitHub</li>
               <li>Fork, modify, or deploy privately</li>
             </ul>
@@ -376,7 +376,7 @@
           class="waitlist-extension-cta"
           variant="compact"
           title="Save chats in one click"
-          description="Free Chrome extension for ChatGPT, Claude, Gemini, and Grok."
+          description="Free browser extension for Chrome and Firefox — ChatGPT, Claude, Gemini, and Grok."
         />
       </div>
     </section>

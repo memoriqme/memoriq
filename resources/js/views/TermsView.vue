@@ -40,7 +40,7 @@
 
         <h2>Extension capture</h2>
         <p>
-          The Chrome extension uses best-effort extraction from supported AI provider
+          The browser extension uses best-effort extraction from supported AI provider
           pages. Providers can change their interfaces at any time, so capture may miss
           content, duplicate content, save formatting imperfectly, or stop working until
           updated.

@@ -25,7 +25,7 @@
         </div>
         <p class="recovery-extension-note">
           Next step: install the
-          <a :href="extensionInstallUrl()" target="_blank" rel="noopener noreferrer">{{ extensionInstallLabel() }}</a>
+          <a :href="CHROME_EXTENSION_URL" target="_blank" rel="noopener noreferrer">browser extension</a>
           to start saving chats from ChatGPT, Claude, Gemini, or Grok.
         </p>
       </section>
@@ -175,7 +175,7 @@
           class="dashboard-extension-banner"
           variant="compact"
           eyebrow="Get started"
-          title="Install the Chrome extension"
+          title="Install the browser extension"
           description="Save conversations from ChatGPT, Claude, Gemini, or Grok in one click."
           show-connect
           dismissible
@@ -610,7 +610,7 @@ import SettingsPanel from '../components/SettingsPanel.vue';
 import ExtensionInstallCta from '../components/ExtensionInstallCta.vue';
 import MemoriqAppLayout from '../layouts/MemoriqAppLayout.vue';
 import { sources } from '../memoriq/demoData';
-import { extensionInstallLabel, extensionInstallUrl } from '../memoriq/links';
+import { CHROME_EXTENSION_URL } from '../memoriq/links';
 import {
   clearPendingRecoveryKey,
   readPendingRecoveryKey,

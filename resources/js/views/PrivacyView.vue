@@ -50,11 +50,13 @@
           encrypted vault contents.
         </p>
 
-        <h2>Chrome extension</h2>
+        <h2>Browser extension</h2>
         <p>
           The Memoriq browser extension is optional software that saves supported AI chat
           conversations into your Memoriq vault. Install it from the
-          <a href="https://chromewebstore.google.com/detail/memoriq/jhhjcchhlfodciphfacegemnemmjdmci" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>.
+          <a href="https://chromewebstore.google.com/detail/memoriq/jhhjcchhlfodciphfacegemnemmjdmci" target="_blank" rel="noopener noreferrer">Chrome Web Store</a>
+          or
+          <a href="https://addons.mozilla.org/en-US/firefox/addon/memoriq/" target="_blank" rel="noopener noreferrer">Firefox Add-ons</a>.
           Source code is open (AGPL-3.0) on
           <a href="https://github.com/memoriqme/memoriq-extension" target="_blank" rel="noopener noreferrer">GitHub</a>.
         </p>

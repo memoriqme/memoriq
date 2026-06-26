@@ -134,7 +134,7 @@
         </div>
 
         <p class="muted">
-          Install the Chrome extension, then connect it to your Memoriq account. Chats are encrypted on your device before upload.
+          Install the browser extension, then connect it to your Memoriq account. Chats are encrypted on your device before upload.
         </p>
 
         <extension-install-cta
