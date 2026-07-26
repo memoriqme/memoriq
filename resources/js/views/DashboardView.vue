@@ -60,6 +60,16 @@
           </label>
 
           <label class="form-field">
+            Conversation URL (optional)
+            <input
+              v-model="pasteForm.sourceUrl"
+              type="url"
+              inputmode="url"
+              placeholder="https://chatgpt.com/..."
+            />
+          </label>
+
+          <label class="form-field">
             AI reply
             <textarea
               v-model="pasteForm.content"
@@ -685,7 +695,7 @@ const pasteModalOpen = ref(false);
 const pasteSaving = ref(false);
 const pasteError = ref('');
 const pasteTitleTouched = ref(false);
-const pasteForm = reactive({ source: 'chatgpt', title: '', content: '' });
+const pasteForm = reactive({ source: 'chatgpt', title: '', content: '', sourceUrl: '' });
 const projectModal = reactive({
   open: false,
   mode: '',
@@ -1441,11 +1451,21 @@ function titleFromPastedReply(value) {
   return cleanTitle(truncate(firstMeaningfulLine || 'Pasted AI reply', 120));
 }
 
+function safeExternalUrl(value) {
+  try {
+    const url = new URL((value || '').trim());
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch (error) {
+    return '';
+  }
+}
+
 function buildManualConversationPayload() {
   const content = pasteForm.content.trim();
   const title = cleanTitle(pasteForm.title) || titleFromPastedReply(content);
   const capturedAt = new Date().toISOString();
   const source = pasteForm.source;
+  const sourceUrl = safeExternalUrl(pasteForm.sourceUrl);
   const message = {
     role: 'assistant',
     content,
@@ -1459,7 +1479,7 @@ function buildManualConversationPayload() {
       version: 2,
       provider: source,
       title,
-      sourceUrl: '',
+      sourceUrl,
       capturedAt,
       project: null,
       tags: [],
@@ -1471,7 +1491,7 @@ function buildManualConversationPayload() {
       version: 2,
       provider: source,
       title,
-      sourceUrl: '',
+      sourceUrl,
       capturedAt,
       messages: [message],
     },
@@ -1497,6 +1517,7 @@ function resetPasteForm() {
   pasteForm.source = 'chatgpt';
   pasteForm.title = '';
   pasteForm.content = '';
+  pasteForm.sourceUrl = '';
   pasteTitleTouched.value = false;
 }
 
@@ -1505,6 +1526,11 @@ async function savePastedReply() {
 
   if (!pasteForm.content.trim()) {
     pasteError.value = 'Paste an AI reply first.';
+    return;
+  }
+
+  if (pasteForm.sourceUrl.trim() && !safeExternalUrl(pasteForm.sourceUrl)) {
+    pasteError.value = 'Enter a valid http(s) conversation URL, or leave it blank.';
     return;
   }
 
