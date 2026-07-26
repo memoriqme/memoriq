@@ -540,26 +540,62 @@
                 </template>
               </div>
             </div>
-            <div class="meta-row">
-              <span class="badge" :class="'source-' + selectedConversation.source">{{ sourceLabel(selectedConversation.source) }}</span>
-              <span class="badge">{{ selectedConversation.project }}</span>
-              <span class="badge">{{ formatDateFull(selectedConversation.archivedAt) }}</span>
-              <span class="badge">{{ formatBytes(selectedConversation.bodyBytes) }}</span>
-              <a
-                v-if="selectedConversation.header?.sourceUrl"
-                class="badge metadata-link"
-                :href="selectedConversation.header.sourceUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Original chat
-              </a>
+            <div class="conversation-header-actions">
+              <div class="meta-row">
+                <span class="badge" :class="'source-' + selectedConversation.source">{{ sourceLabel(selectedConversation.source) }}</span>
+                <span class="badge">{{ selectedConversation.project }}</span>
+                <span class="badge">{{ formatDateFull(selectedConversation.archivedAt) }}</span>
+                <span class="badge">{{ formatBytes(selectedConversation.bodyBytes) }}</span>
+                <div class="conversation-export-menu" @click.stop>
+                  <button
+                    class="conversation-header-icon"
+                    type="button"
+                    :disabled="exportingId === selectedConversation.id || bodyLoadingId === selectedConversation.id"
+                    :title="exportingId === selectedConversation.id ? 'Exporting' : 'Download conversation'"
+                    aria-label="Download conversation"
+                    :aria-expanded="exportMenuOpenId === selectedConversation.id"
+                    aria-haspopup="menu"
+                    @click.stop="toggleExportMenu(selectedConversation.id)"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <path d="M7 10l5 5 5-5"/>
+                      <path d="M12 15V3"/>
+                    </svg>
+                  </button>
+                  <div v-if="exportMenuOpenId === selectedConversation.id" class="conversation-export-dropdown" role="menu">
+                    <button type="button" role="menuitem" :disabled="exportingId === selectedConversation.id" @click="exportConversationJson(selectedConversation)">
+                      Download JSON
+                    </button>
+                    <button type="button" role="menuitem" :disabled="exportingId === selectedConversation.id" @click="exportConversationHandoff(selectedConversation)">
+                      Download handoff file
+                    </button>
+                  </div>
+                </div>
+                <a
+                  v-if="selectedConversation.header?.sourceUrl"
+                  class="conversation-header-icon"
+                  :href="selectedConversation.header.sourceUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open original chat"
+                  aria-label="Open original chat"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <path d="M15 3h6v6"/>
+                    <path d="M10 14 21 3"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </header>
 
           <div class="archived-banner">
             End-to-end encrypted · Decrypted locally on this device
           </div>
+
+          <div v-if="exportError" class="form-alert conversation-delete-alert">{{ exportError }}</div>
 
           <div v-if="bodyLoadingId === selectedConversation.id" class="empty-card">
             Loading encrypted messages…
@@ -616,6 +652,7 @@ import {
   readPendingRecoveryKey,
 } from '../memoriq/recoveryKey';
 import { useEncryptionStore } from '../stores/encryptionStore';
+import { messagePlainText } from '../utils/renderMessage';
 import { collectSearchResults, conversationHaystack } from '../utils/searchText';
 
 const encryption = useEncryptionStore();
@@ -636,11 +673,14 @@ const activeSource = ref(null);
 const selectedId = ref(null);
 const deletingId = ref(null);
 const movingId = ref(null);
+const exportingId = ref(null);
+const exportMenuOpenId = ref(null);
 const projectUpdating = ref(null);
 const renamingId = ref(null);
 const titleDraft = ref('');
 const titleInputRef = ref(null);
 const deleteError = ref('');
+const exportError = ref('');
 const pasteModalOpen = ref(false);
 const pasteSaving = ref(false);
 const pasteError = ref('');
@@ -758,6 +798,8 @@ watch(filteredConversations, (list) => {
 watch(selectedId, async () => {
   cancelTitleRename();
   messageRefs.value = {};
+  exportError.value = '';
+  exportMenuOpenId.value = null;
   if (selectedConversation.value && !activeSearchQuery.value) {
     await loadConversationBody(selectedConversation.value);
   }
@@ -791,6 +833,14 @@ function selectConversation(id) {
   }
   focusMessageIndex.value = null;
   selectedId.value = id;
+}
+
+function toggleExportMenu(id) {
+  exportMenuOpenId.value = exportMenuOpenId.value === id ? null : id;
+}
+
+function closeExportMenu() {
+  exportMenuOpenId.value = null;
 }
 
 function showMobileConversationList() {
@@ -829,6 +879,7 @@ async function openSearchResult(result) {
 
 onMounted(async () => {
   document.addEventListener('visibilitychange', onTabVisibilityChange);
+  document.addEventListener('click', closeExportMenu);
   window.addEventListener(VAULT_IMPORTED_EVENT, onVaultImported);
   await encryption.fetchStatus();
   restorePendingRecoveryKeyModal();
@@ -844,6 +895,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.removeEventListener('visibilitychange', onTabVisibilityChange);
+  document.removeEventListener('click', closeExportMenu);
   window.removeEventListener(VAULT_IMPORTED_EVENT, onVaultImported);
 });
 
@@ -1084,6 +1136,7 @@ async function loadConversations(page = 1, append = false, options = {}) {
           header,
           encryptedBody: item.encrypted_body || '',
           bodyBytes: item.body_bytes || 0,
+          body: null,
           messages: null,
           bodyLoaded: false,
         });
@@ -1099,6 +1152,7 @@ async function loadConversations(page = 1, append = false, options = {}) {
           snippet: '',
           searchText: '',
           bodyBytes: item.body_bytes || 0,
+          body: null,
           messages: [{ role: 'assistant', content: ['This conversation could not be decrypted with the current key.'] }],
           bodyLoaded: true,
         });
@@ -1147,6 +1201,7 @@ async function loadConversationBody(conversation) {
     }
 
     const body = await encryption.decrypt(encryptedBody);
+    conversation.body = body;
     conversation.messages = body.messages || [];
     conversation.bodyLoaded = true;
 
@@ -1168,6 +1223,156 @@ async function loadConversationBody(conversation) {
   } finally {
     bodyLoadingId.value = null;
   }
+}
+
+async function exportConversationJson(conversation) {
+  if (!conversation?.id || exportingId.value) return;
+
+  exportError.value = '';
+  exportMenuOpenId.value = null;
+  exportingId.value = conversation.id;
+
+  try {
+    await ensureConversationBodyForExport(conversation);
+
+    const exportedAt = new Date().toISOString();
+    const payload = {
+      type: 'memoriq.conversation.export',
+      formatVersion: 1,
+      exportedAt,
+      conversation: {
+        id: conversation.id,
+        title: conversation.title,
+        source: conversation.source,
+        sourceLabel: sourceLabel(conversation.source),
+        project: conversation.project || null,
+        tags: conversation.tags || [],
+        archivedAt: conversation.archivedAt || null,
+        capturedAt: conversation.header?.capturedAt || conversation.archivedAt || null,
+        sourceUrl: conversation.header?.sourceUrl || null,
+        messageCount: conversation.messages?.length || conversation.messageCount || 0,
+        snippet: conversation.snippet || '',
+        bodyBytes: conversation.bodyBytes || 0,
+        header: conversation.header || null,
+        body: conversation.body || {
+          version: 2,
+          provider: conversation.source,
+          title: conversation.title,
+          sourceUrl: conversation.header?.sourceUrl || '',
+          capturedAt: conversation.header?.capturedAt || conversation.archivedAt || null,
+          messages: conversation.messages || [],
+        },
+        messages: conversation.messages || [],
+      },
+    };
+
+    downloadJson(payload, `${safeFilenamePart(conversation.title || 'conversation')}.json`);
+  } catch (error) {
+    exportError.value = error.response?.data?.message || error.message || 'Unable to export this conversation.';
+  } finally {
+    exportingId.value = null;
+  }
+}
+
+async function exportConversationHandoff(conversation) {
+  if (!conversation?.id || exportingId.value) return;
+
+  exportError.value = '';
+  exportMenuOpenId.value = null;
+  exportingId.value = conversation.id;
+
+  try {
+    await ensureConversationBodyForExport(conversation);
+    const markdown = buildConversationHandoffMarkdown(conversation);
+    downloadText(markdown, `${safeFilenamePart(conversation.title || 'conversation')}-handoff.md`, 'text/markdown');
+  } catch (error) {
+    exportError.value = error.response?.data?.message || error.message || 'Unable to export this conversation.';
+  } finally {
+    exportingId.value = null;
+  }
+}
+
+async function ensureConversationBodyForExport(conversation) {
+  await loadConversationBody(conversation);
+
+  if (!conversation.bodyLoaded) {
+    throw new Error(bodyError.value || 'Unable to load this conversation before export.');
+  }
+}
+
+function downloadJson(payload, filename) {
+  downloadText(`${JSON.stringify(payload, null, 2)}\n`, filename, 'application/json');
+}
+
+function downloadText(content, filename, type = 'text/plain') {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function buildConversationHandoffMarkdown(conversation) {
+  const messages = conversation.messages || [];
+  const recentMessages = messages.slice(-12);
+  const lines = [
+    '# Continue This Conversation',
+    '',
+    'Use this file to continue a previous AI conversation in a new chat. Read the continuation prompt first, then use the metadata, recent messages, and full transcript as context.',
+    '',
+    '## Continuation Prompt',
+    '',
+    'Read this file as context from a previous conversation. Infer the current goal, decisions, preferences, constraints, and unresolved tasks from the metadata and transcript. Continue from where the conversation left off. Do not summarize the transcript unless asked. Ask only if something needed to continue is ambiguous.',
+    '',
+    '## Metadata',
+    '',
+    `- Title: ${conversation.title || 'Untitled conversation'}`,
+    `- Source: ${sourceLabel(conversation.source)}`,
+    `- Project: ${conversation.project || 'Unsorted'}`,
+    `- Archived at: ${conversation.archivedAt || 'Unknown'}`,
+    `- Captured at: ${conversation.header?.capturedAt || 'Unknown'}`,
+    `- Original chat: ${conversation.header?.sourceUrl || 'Not available'}`,
+    `- Tags: ${(conversation.tags || []).join(', ') || 'None'}`,
+    `- Message count: ${messages.length || conversation.messageCount || 0}`,
+  ];
+
+  if (conversation.snippet) {
+    lines.push('', '## Saved Snippet', '', conversation.snippet);
+  }
+
+  lines.push(
+    '',
+    '## Recent Messages',
+    '',
+    ...formatMessagesForHandoff(recentMessages, conversation),
+    '',
+    '## Full Transcript',
+    '',
+    ...formatMessagesForHandoff(messages, conversation),
+    '',
+  );
+
+  return `${lines.join('\n')}\n`;
+}
+
+function formatMessagesForHandoff(messages, conversation) {
+  if (!messages.length) return ['No messages were available in this export.'];
+
+  return messages.flatMap((message, index) => {
+    const role = message.role === 'user' ? 'User' : sourceLabel(conversation.source);
+    const text = messagePlainText(normalizeMessage(message)).trim() || '[No text content]';
+
+    return [
+      `### ${index + 1}. ${role}`,
+      '',
+      text,
+      '',
+    ];
+  });
 }
 
 async function onVaultImported() {
@@ -1202,6 +1407,15 @@ function cleanTitle(value) {
 function truncate(value, maxLength) {
   if (!value || value.length <= maxLength) return value || '';
   return `${value.slice(0, maxLength).trim()}…`;
+}
+
+function safeFilenamePart(value) {
+  return (value || 'conversation')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z0-9_.-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'conversation';
 }
 
 function plainTextFromMarkdown(value) {
@@ -1318,6 +1532,7 @@ async function savePastedReply() {
       header: payload.header,
       encryptedBody,
       bodyBytes: data.body_bytes || encryptedBody.length,
+      body: payload.body,
       messages: payload.body.messages,
       bodyLoaded: true,
     };

@@ -196,7 +196,8 @@ a {
 [data-theme="light"] .hamburger-btn,
 [data-theme="light"] .mobile-back-button,
 [data-theme="light"] .sidebar-logout-btn,
-[data-theme="light"] .conversation-title-edit {
+[data-theme="light"] .conversation-title-edit,
+[data-theme="light"] .conversation-header-icon {
   border-color: #d0d0d0;
   background: #ffffff;
   color: var(--text-secondary);
@@ -207,7 +208,8 @@ a {
 [data-theme="light"] .hamburger-btn:hover,
 [data-theme="light"] .mobile-back-button:hover,
 [data-theme="light"] .sidebar-logout-btn:hover:not(:disabled),
-[data-theme="light"] .conversation-title-edit:hover:not(:disabled) {
+[data-theme="light"] .conversation-title-edit:hover:not(:disabled),
+[data-theme="light"] .conversation-header-icon:hover:not(:disabled) {
   border-color: #b8b8b8;
   background: #eeeeee;
   color: var(--text);
@@ -1381,6 +1383,78 @@ body.app-menu-open {
 .conversation-title-edit svg {
   width: 15px;
   height: 15px;
+}
+
+.conversation-header-actions {
+  display: grid;
+  justify-items: end;
+}
+
+.conversation-header-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.conversation-header-icon:hover:not(:disabled) {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.conversation-header-icon:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.conversation-header-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.conversation-export-menu {
+  position: relative;
+}
+
+.conversation-export-dropdown {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  min-width: 190px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+.conversation-export-dropdown button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 10px 12px;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+}
+
+.conversation-export-dropdown button:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.conversation-export-dropdown button:disabled {
+  cursor: default;
+  opacity: 0.55;
 }
 
 .conversation-delete-alert {
@@ -2674,5 +2748,9 @@ body.app-menu-open {
   .stats-row,
   .meta-row {
     justify-content: flex-start;
+  }
+
+  .conversation-header-actions {
+    justify-items: start;
   }
 }
