@@ -1,5 +1,5 @@
 <template>
-  <div class="mvp-landing">
+  <div class="mvp-landing" :data-landing-theme="theme">
     <nav class="nav">
       <div class="container nav-inner">
         <router-link to="/" class="logo">
@@ -888,6 +888,22 @@ section[id] {
   color: var(--text);
 }
 
+.mvp-landing[data-landing-theme="light"] .theme-btn,
+.mvp-landing[data-landing-theme="light"] .nav-toggle,
+.mvp-landing[data-landing-theme="light"] .btn-ghost {
+  border-color: #d0d0d0;
+  background: #ffffff;
+  color: var(--text-secondary);
+}
+
+.mvp-landing[data-landing-theme="light"] .theme-btn:hover,
+.mvp-landing[data-landing-theme="light"] .nav-toggle:hover,
+.mvp-landing[data-landing-theme="light"] .btn-ghost:hover {
+  border-color: #b8b8b8;
+  background: #eeeeee;
+  color: var(--text);
+}
+
 .btn-lg {
   border-radius: 12px;
   padding: 14px 28px;
@@ -1236,57 +1252,65 @@ section.alt {
   padding: 0 34px 16px 0;
 }
 
-/* ─── Landing page light theme ─────────────────────────────────────────────
-   Built from scratch by inverting the landing dark palette and merging
-   it with the app light theme's clean, minimal character.
-   ─────────────────────────────────────────────────────────────────────── */
-[data-theme="light"] .mvp-landing {
-  /* Backgrounds — warm off-white layering (mirrors dark's near-black steps) */
+/* Landing keeps its own light palette; demo preview matches the app UI. */
+.mvp-landing[data-landing-theme="light"] {
   --bg: #f7f7f5;
   --bg-elevated: #f0efec;
   --bg-card: #ffffff;
-
-  /* Surfaces — warm light, for inputs / hover / active states */
   --surface: #edece8;
   --surface-strong: #e4e2dd;
-
-  /* Borders */
   --border: #dcdad4;
   --border-soft: #e7e5e0;
-
-  /* Typography */
   --text: #111110;
   --text-secondary: #4a4946;
   --text-muted: #878480;
-
-  /* Brand accent — teal stays the same; contrast is fine on warm white */
   --accent: #148b74;
   --accent-hover: #117a66;
   --accent-soft: rgba(20, 139, 116, 0.09);
   --accent-border: rgba(20, 139, 116, 0.2);
-
-  /* Semantic */
   --danger: #dc2626;
   --success: #087f5b;
   --link: #0969da;
-
-  /* Nav */
   --nav-bg: rgba(247, 247, 245, 0.9);
-
-  /* Depth */
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.07);
-
-  /* Chat preview / code */
   --user-bubble: #edece8;
   --code-bg: #f2f1ee;
   --code-inline-fg: #c7254e;
-
-  /* Scrollbar */
   --scrollbar-track: #f0efec;
   --scrollbar-thumb: #c4c2bd;
   --scrollbar-thumb-hover: #a4a29d;
-
   color-scheme: light;
+}
+
+.mvp-landing[data-landing-theme="light"] .product-card {
+  --user-bubble: #f4f4f4;
+  --code-bg: #f6f8fa;
+  --bg: #ffffff;
+  --bg-elevated: #f7f7f7;
+  --bg-card: #ffffff;
+  --surface: #f1f1f1;
+  --surface-strong: #e6e6e6;
+  --border: #e5e5e5;
+  --border-soft: #eeeeee;
+  --text: #0a0a0a;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+  --accent-soft: rgba(20, 139, 116, 0.1);
+  --accent-border: rgba(20, 139, 116, 0.25);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.08);
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #c8c8c8;
+  --scrollbar-thumb-hover: #a8a8a8;
+}
+
+.mvp-landing[data-landing-theme="light"] .product-card .preview-project.active,
+.mvp-landing[data-landing-theme="light"] .product-card .preview-thread.active {
+  background: #e9e9e9;
+  box-shadow: inset 0 0 0 1px #c8c8c8;
+}
+
+.mvp-landing[data-landing-theme="light"] .product-card .bubble {
+  background: #f4f4f4;
 }
 
 .preview-title {
@@ -1316,7 +1340,7 @@ section.alt {
   color: #7baaf7;
 }
 
-[data-theme="light"] .mini-badge.source-gemini {
+.mvp-landing[data-landing-theme="light"] .mini-badge.source-gemini {
   border-color: rgba(66, 133, 244, 0.2);
   background: rgba(66, 133, 244, 0.08);
   color: #1a56db;
@@ -1328,7 +1352,7 @@ section.alt {
   color: #6dd4b0;
 }
 
-[data-theme="light"] .mini-badge.source-chatgpt {
+.mvp-landing[data-landing-theme="light"] .mini-badge.source-chatgpt {
   border-color: rgba(20, 139, 116, 0.2);
   background: rgba(20, 139, 116, 0.08);
   color: #0d7a61;
@@ -1340,7 +1364,7 @@ section.alt {
   color: #e8a88a;
 }
 
-[data-theme="light"] .mini-badge.source-claude {
+.mvp-landing[data-landing-theme="light"] .mini-badge.source-claude {
   border-color: rgba(204, 120, 92, 0.2);
   background: rgba(204, 120, 92, 0.08);
   color: #c2410c;
@@ -1392,7 +1416,7 @@ section.alt {
   max-width: 82%;
   margin-left: auto;
   border-radius: 18px;
-  background: var(--surface);
+  background: var(--user-bubble);
   color: var(--text);
   padding: 11px 14px;
   font-size: 13px;
@@ -1870,7 +1894,7 @@ section.alt {
   color: #e06c75;
 }
 
-[data-theme="light"] .pt-key {
+.mvp-landing[data-landing-theme="light"] .pt-key {
   color: #b91c1c;
 }
 
@@ -1878,7 +1902,7 @@ section.alt {
   color: #98c379;
 }
 
-[data-theme="light"] .pt-val {
+.mvp-landing[data-landing-theme="light"] .pt-val {
   color: #15803d;
 }
 
