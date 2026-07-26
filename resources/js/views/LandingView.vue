@@ -40,10 +40,12 @@
     <header class="hero">
       <div class="container">
         <div class="hero-badges">
-          <div class="hero-badge hero-badge-primary">🔒 End-to-end encrypted · Zero-knowledge</div>
-          <div class="hero-badge">Open source - free to use - self-hostable</div>
+          <div class="hero-badge">
+            <span class="hero-badge-icon" aria-hidden="true">🔒</span>
+            <span class="hero-badge-text">End-to-End Encrypted Vault</span>
+          </div>
         </div>
-        <h1>Your private AI memory</h1>
+        <h1>Your Private AI Memory</h1>
         <p class="hero-lead">
           Save the conversations that matter from ChatGPT, Claude, Gemini, and Grok in one searchable vault - encrypted on your device before anything reaches our servers.
         </p>
@@ -920,26 +922,39 @@ section[id] {
 
 .hero-badges {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 
 .hero-badge {
   display: inline-flex;
-  gap: 8px;
-  border: 1px solid rgba(20, 139, 116, 0.25);
-  border-radius: 100px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  padding: 6px 14px;
-  font-size: 13px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  padding: 5px 18px 5px 5px;
 }
 
-.hero-badge-primary {
-  border-color: rgba(20, 139, 116, 0.45);
+.hero-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.hero-badge-text {
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--accent) 80%, var(--text) 20%);
 }
 
 .hero h1 {
@@ -2262,14 +2277,8 @@ section.alt {
   }
 
   .hero-badges {
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-    margin-bottom: -11px;
-  }
-
-  .hero-badge + .hero-badge {
-    margin-top: -13px;
+    margin-top: 10px;
+    margin-bottom: -10px;
   }
 
   .hero h1 {
