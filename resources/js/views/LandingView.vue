@@ -38,7 +38,7 @@
     </nav>
 
     <header class="hero">
-      <div class="container">
+      <div class="container hero-group">
         <div class="hero-badges">
           <div class="hero-badge">
             <span class="hero-badge-icon" aria-hidden="true">🔒</span>
@@ -60,20 +60,17 @@
             View source on GitHub
           </a>
         </div>
-      </div>
-    </header>
-
-    <section class="providers-section">
-      <div class="container">
-        <div class="providers-label">Works with every major AI</div>
-        <div class="providers-list">
-          <span class="provider-pill-sm"><span class="provider-dot chatgpt"></span>ChatGPT</span>
-          <span class="provider-pill-sm"><span class="provider-dot claude"></span>Claude</span>
-          <span class="provider-pill-sm"><span class="provider-dot gemini"></span>Gemini</span>
-          <span class="provider-pill-sm"><span class="provider-dot grok"></span>Grok</span>
+        <div class="providers-section">
+          <div class="providers-label">Works with every major AI</div>
+          <div class="providers-list">
+            <span class="provider-pill-sm"><span class="provider-dot chatgpt"></span>ChatGPT</span>
+            <span class="provider-pill-sm"><span class="provider-dot claude"></span>Claude</span>
+            <span class="provider-pill-sm"><span class="provider-dot gemini"></span>Gemini</span>
+            <span class="provider-pill-sm"><span class="provider-dot grok"></span>Grok</span>
+          </div>
         </div>
       </div>
-    </section>
+    </header>
 
     <section id="demo" class="demo-section">
       <div class="container">
@@ -913,11 +910,15 @@ section[id] {
 }
 
 .hero {
-  padding: 140px 0 72px;
+  padding: 140px 0 62px;
   background:
     radial-gradient(ellipse 80% 60% at 50% -20%, rgba(20, 139, 116, 0.18), transparent 60%),
     radial-gradient(ellipse 50% 40% at 100% 0%, rgba(66, 133, 244, 0.08), transparent 50%);
   text-align: center;
+}
+
+.hero-group {
+  width: 100%;
 }
 
 .hero-badges {
@@ -995,7 +996,8 @@ section[id] {
 }
 
 .providers-section {
-  padding: 0 0 56px;
+  margin-top: 68px;
+  padding: 0;
   text-align: center;
 }
 
@@ -2256,10 +2258,6 @@ section.alt {
     padding: 90px 0;
   }
 
-  .providers-section {
-    padding: 0 0 46px;
-  }
-
   .waitlist-section {
     padding: 90px 0 110px;
   }
@@ -2272,17 +2270,28 @@ section.alt {
     padding: 46px 0 32px;
   }
 
+  /* Fill the first screen and vertically center the hero group under the fixed nav */
   .hero {
-    padding: 80px 0 28px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100svh;
+    min-height: 100dvh;
+    padding: 80px 0 32px;
   }
 
   .hero-badges {
-    margin-top: 10px;
+    margin-top: 0;
     margin-bottom: -10px;
   }
 
   .hero h1 {
     margin-top: 10px;
+  }
+
+  .providers-section {
+    margin-top: 36px;
   }
 
   .providers-list {
