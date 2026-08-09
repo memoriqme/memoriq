@@ -27,11 +27,11 @@ Route::get('/settings', function () {
 });
 
 Route::get('/privacy', function () {
-    return view('welcome');
+    return view('privacy');
 });
 
 Route::get('/terms', function () {
-    return view('welcome');
+    return view('terms');
 });
 
 Route::get('/share', function () {

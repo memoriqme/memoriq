@@ -34,8 +34,10 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/landing.css',
+                'resources/css/page.css',
                 'resources/js/app.js',
                 'resources/js/landing.js',
+                'resources/js/page.js',
             ],
             refresh: true,
         }),

@@ -2,8 +2,6 @@ import DashboardView from './views/DashboardView.vue';
 import ShareView from './views/ShareView.vue';
 import LoginView from './views/LoginView.vue';
 import RegisterView from './views/RegisterView.vue';
-import PrivacyView from './views/PrivacyView.vue';
-import TermsView from './views/TermsView.vue';
 
 import ForgotPassword from './account/Auth/ForgotPassword.vue';
 import ResetPassword from './account/Auth/ResetPassword.vue';
@@ -12,18 +10,6 @@ import VerifiedEmail from './account/Auth/VerifiedEmail.vue';
 
 export default {
   routes: [
-    {
-      path: '/privacy',
-      name: 'Privacy',
-      component: PrivacyView,
-      meta: { title: 'Memoriq - Privacy Policy' },
-    },
-    {
-      path: '/terms',
-      name: 'Terms',
-      component: TermsView,
-      meta: { title: 'Memoriq - Terms of Service' },
-    },
     {
       path: '/dashboard',
       name: 'Dashboard',
