@@ -15,7 +15,7 @@ Route::get('/manifest.webmanifest', function () {
 });
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing');
 });
 
 Route::get('/dashboard', function () {

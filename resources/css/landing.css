@@ -1,0 +1,159 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root,
+[data-theme="dark"] {
+  --user-bubble: #303030;
+  --code-bg: #1a1a1a;
+  --code-inline-fg: #e06c75;
+  --link: #7ab7ff;
+  --mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  --bg: #0a0a0a;
+  --bg-elevated: #141414;
+  --bg-card: #1a1a1a;
+  --surface: #242424;
+  --surface-strong: #303030;
+  --border: #2f2f2f;
+  --border-soft: #242424;
+  --text: #f5f5f5;
+  --text-secondary: #b4b4b4;
+  --text-muted: #737373;
+  --accent: #148b74;
+  --accent-hover: #117a66;
+  --accent-soft: rgba(20, 139, 116, 0.14);
+  --accent-border: rgba(20, 139, 116, 0.28);
+  --danger: #ef4444;
+  --success: #42d392;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  --nav-bg: rgba(10, 10, 10, 0.84);
+  --provider-chatgpt: #10a37f;
+  --provider-claude: #d97757;
+  --provider-gemini: #4285f4;
+  --provider-grok: #9ca3af;
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  --scrollbar-track: #141414;
+  --scrollbar-thumb: #3a3a3a;
+  --scrollbar-thumb-hover: #525252;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --user-bubble: #f4f4f4;
+  --code-bg: #f6f8fa;
+  --code-inline-fg: #c7254e;
+  --link: #0969da;
+  --mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  --bg: #ffffff;
+  --bg-elevated: #f7f7f7;
+  --bg-card: #ffffff;
+  --surface: #f1f1f1;
+  --surface-strong: #e6e6e6;
+  --border: #e5e5e5;
+  --border-soft: #eeeeee;
+  --text: #0a0a0a;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+  --accent: #148b74;
+  --accent-hover: #117a66;
+  --accent-soft: rgba(20, 139, 116, 0.1);
+  --accent-border: rgba(20, 139, 116, 0.25);
+  --danger: #dc2626;
+  --success: #087f5b;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.08);
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #c8c8c8;
+  --scrollbar-thumb-hover: #a8a8a8;
+  color-scheme: light;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid var(--scrollbar-track);
+  border-radius: 999px;
+  background: var(--scrollbar-thumb);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.memoriq-logo {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Component styles are prepended verbatim from LandingView.vue and
+   ExtensionInstallCta.vue by the memoriq-landing-styles Vite plugin.
+   Keep only static Blade/runtime fixes here, not layout tuning. */
+
+.theme-btn svg[hidden],
+.nav-toggle svg[hidden],
+.demo-chat-panel[hidden] {
+  display: none !important;
+}
+
+.product-card .answer strong {
+  color: var(--text-secondary);
+}
+
+.mvp-landing .section-label {
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mvp-landing .section-title {
+  margin: 0 0 16px;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.newsletter-feedback:empty {
+  display: none;
+}

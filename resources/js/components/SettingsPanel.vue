@@ -257,7 +257,6 @@
 <script setup>
 import axios from 'axios';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import AppMenuButton from './AppMenuButton.vue';
 import ExtensionInstallCta from './ExtensionInstallCta.vue';
 import { applyTheme, getStoredTheme } from '../memoriq/theme';
@@ -273,7 +272,6 @@ defineProps({
 
 const auth = useAuthStore();
 const encryption = useEncryptionStore();
-const router = useRouter();
 
 const profileProcessing = ref(false);
 const profileMessage = ref('');
@@ -520,7 +518,7 @@ async function logout() {
   } finally {
     auth.user = null;
     loggingOut.value = false;
-    router.push({ name: 'Home' });
+    window.location = '/';
   }
 }
 

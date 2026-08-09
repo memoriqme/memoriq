@@ -1,4 +1,3 @@
-import LandingView from './views/LandingView.vue';
 import DashboardView from './views/DashboardView.vue';
 import ShareView from './views/ShareView.vue';
 import LoginView from './views/LoginView.vue';
@@ -13,12 +12,6 @@ import VerifiedEmail from './account/Auth/VerifiedEmail.vue';
 
 export default {
   routes: [
-    {
-      path: '/',
-      name: 'Home',
-      component: LandingView,
-      meta: { title: 'Memoriq - Private AI Memory Vault' },
-    },
     {
       path: '/privacy',
       name: 'Privacy',

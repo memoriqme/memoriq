@@ -52,7 +52,7 @@ router.beforeEach(async (to, from, next) => {
         return next({ name: 'Login', query: { redirect: to.fullPath } });
     }
 
-    if (auth.isLoggedIn && (to.meta.guestOnly || to.name === 'Home')) {
+    if (auth.isLoggedIn && to.meta.guestOnly) {
         return next({ name: 'Dashboard' });
     }
 

@@ -1,5 +1,9 @@
 <template>
-  <router-link :to="to" class="brand">
+  <a v-if="to === '/'" href="/" class="brand">
+    <memoriq-logo />
+    <span>Memoriq</span>
+  </a>
+  <router-link v-else :to="to" class="brand">
     <memoriq-logo />
     <span>Memoriq</span>
   </router-link>

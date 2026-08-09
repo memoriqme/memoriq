@@ -1,10 +1,10 @@
 <template>
   <main class="legal-page">
     <div class="legal-shell">
-      <router-link to="/" class="legal-brand">
+      <a href="/" class="legal-brand">
         <memoriq-logo :size="36" />
         <span>Memoriq</span>
-      </router-link>
+      </a>
 
       <section class="legal-card">
         <p class="legal-eyebrow">Privacy Policy</p>

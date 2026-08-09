@@ -34,13 +34,11 @@
 <script setup>
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { applyTheme, getStoredTheme } from '../../memoriq/theme';
 import AppBrand from '../../components/AppBrand.vue';
 import { useAuthStore } from '../../stores/authStore';
 
 const auth = useAuthStore();
-const router = useRouter();
 const processing = ref(false);
 const status = ref('');
 const errors = ref(false);
@@ -65,6 +63,6 @@ async function submit() {
 async function logout() {
   await axios.post('/logout');
   auth.user = null;
-  router.push({ name: 'Home' });
+  window.location = '/';
 }
 </script>
