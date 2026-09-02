@@ -613,59 +613,63 @@
                 <span v-if="selectedConversation.project" class="badge">{{ selectedConversation.project }}</span>
                 <span class="badge">{{ formatDateFull(selectedConversation.archivedAt) }}</span>
                 <span class="badge">{{ formatBytes(selectedConversation.bodyBytes) }}</span>
-                <button
-                  class="conversation-header-icon"
-                  type="button"
-                  title="Edit conversation"
-                  aria-label="Edit conversation"
-                  :disabled="!!movingId"
-                  @click="openEditConversationModal(selectedConversation)"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-                  </svg>
-                </button>
-                <div class="conversation-export-menu" @click.stop>
+                <div class="conversation-action-row">
                   <button
                     class="conversation-header-icon"
                     type="button"
-                    :disabled="exportingId === selectedConversation.id || bodyLoadingId === selectedConversation.id"
-                    :title="exportingId === selectedConversation.id ? 'Exporting' : 'Download conversation'"
-                    aria-label="Download conversation"
-                    :aria-expanded="exportMenuOpenId === selectedConversation.id"
-                    aria-haspopup="menu"
-                    @click.stop="toggleExportMenu(selectedConversation.id)"
+                    title="Edit conversation"
+                    aria-label="Edit conversation"
+                    :disabled="!!movingId"
+                    @click="openEditConversationModal(selectedConversation)"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <path d="M7 10l5 5 5-5"/>
-                      <path d="M12 15V3"/>
+                      <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
                     </svg>
                   </button>
-                  <div v-if="exportMenuOpenId === selectedConversation.id" class="conversation-export-dropdown" role="menu">
-                    <button type="button" role="menuitem" :disabled="exportingId === selectedConversation.id" @click="exportConversationJson(selectedConversation)">
-                      Download JSON
+
+                  <div class="conversation-export-menu" @click.stop>
+                    <button
+                      class="conversation-header-icon"
+                      type="button"
+                      :disabled="exportingId === selectedConversation.id || bodyLoadingId === selectedConversation.id"
+                      :title="exportingId === selectedConversation.id ? 'Exporting' : 'Download conversation'"
+                      aria-label="Download conversation"
+                      :aria-expanded="exportMenuOpenId === selectedConversation.id"
+                      aria-haspopup="menu"
+                      @click.stop="toggleExportMenu(selectedConversation.id)"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <path d="M7 10l5 5 5-5"/>
+                        <path d="M12 15V3"/>
+                      </svg>
                     </button>
-                    <button type="button" role="menuitem" :disabled="exportingId === selectedConversation.id" @click="exportConversationHandoff(selectedConversation)">
-                      Download handoff file
-                    </button>
+                    <div v-if="exportMenuOpenId === selectedConversation.id" class="conversation-export-dropdown" role="menu">
+                      <button type="button" role="menuitem" :disabled="exportingId === selectedConversation.id" @click="exportConversationJson(selectedConversation)">
+                        Download JSON
+                      </button>
+                      <button type="button" role="menuitem" :disabled="exportingId === selectedConversation.id" @click="exportConversationHandoff(selectedConversation)">
+                        Download handoff file
+                      </button>
+                    </div>
                   </div>
+
+                  <a
+                    v-if="selectedConversation.header?.sourceUrl"
+                    class="conversation-header-icon"
+                    :href="selectedConversation.header.sourceUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Open original chat"
+                    aria-label="Open original chat"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <path d="M15 3h6v6"/>
+                      <path d="M10 14 21 3"/>
+                    </svg>
+                  </a>
                 </div>
-                <a
-                  v-if="selectedConversation.header?.sourceUrl"
-                  class="conversation-header-icon"
-                  :href="selectedConversation.header.sourceUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Open original chat"
-                  aria-label="Open original chat"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                    <path d="M15 3h6v6"/>
-                    <path d="M10 14 21 3"/>
-                  </svg>
-                </a>
               </div>
             </div>
             <div class="conversation-header-actions">
