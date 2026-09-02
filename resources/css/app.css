@@ -1062,6 +1062,14 @@ body.app-menu-open {
   margin: 0 16px 32px;
 }
 
+.dashboard-extension-spacer {
+  height: 10px;
+}
+
+.panel-memory-spacer {
+  height: 10px;
+}
+
 .sidebar-extension-cta {
   margin: 0 16px 16px;
 }
@@ -1109,6 +1117,7 @@ body.app-menu-open {
 
 .conversation-panel {
   border: 0;
+  position: relative;
   padding: 32px;
 }
 
@@ -1116,6 +1125,20 @@ body.app-menu-open {
   display: grid;
   align-content: center;
   justify-items: center;
+}
+
+.dashboard-view-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 22px;
+}
+
+.conversation-panel--centered .dashboard-view-controls,
+.conversation-panel--empty .dashboard-view-controls {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  margin: 0;
 }
 
 .conversation-panel--centered .vault-card {
@@ -1154,6 +1177,10 @@ body.app-menu-open {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.dashboard-sidebar-controls {
+  display: none;
 }
 
 .page-menu-anchor {
@@ -1289,13 +1316,19 @@ body.app-menu-open {
   pointer-events: auto;
 }
 
-.conversation-sticky-controls .hamburger-btn {
+.conversation-sticky-controls .conversation-toolbar {
   display: none;
+  margin-left: auto;
+}
+
+.conversation-sticky-controls .icon-button,
+.conversation-sticky-controls .hamburger-btn {
   width: 32px;
   height: 32px;
   border-radius: 9px;
 }
 
+.conversation-sticky-controls .icon-button svg,
 .conversation-sticky-controls .hamburger-btn svg {
   width: 16px;
   height: 16px;
@@ -1318,13 +1351,23 @@ body.app-menu-open {
 
 .conversation-title-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   min-width: 0;
 }
 
 .conversation-title-row h2 {
   min-width: 0;
+}
+
+.conversation-header-main {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+}
+
+.conversation-header-main .meta-row {
+  justify-content: flex-start;
 }
 
 .conversation-title-input {
@@ -1351,6 +1394,7 @@ body.app-menu-open {
   place-items: center;
   width: 32px;
   height: 32px;
+  margin-top: 4px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
@@ -1381,7 +1425,9 @@ body.app-menu-open {
 
 .conversation-header-actions {
   display: grid;
+  gap: 10px;
   justify-items: end;
+  flex-shrink: 0;
 }
 
 .conversation-header-icon {
@@ -2241,7 +2287,7 @@ body.app-menu-open {
   margin: 0 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 42px 32px 80px;
+  padding: 32px 32px 64px;
 }
 
 .settings-page--embedded {
@@ -2250,7 +2296,7 @@ body.app-menu-open {
   height: auto;
   margin: 0 auto;
   overflow: visible;
-  padding: 0 0 48px;
+  padding: 0 0 32px;
 }
 
 .settings-page--embedded .settings-grid {
@@ -2288,8 +2334,9 @@ body.app-menu-open {
 
 .conversation-panel--settings {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  padding: 24px 32px 48px;
+  padding: 32px;
 }
 
 .app-shell--settings-scroll {
@@ -2567,6 +2614,10 @@ body.app-menu-open {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.settings-grid .settings-card {
+  padding: 24px;
+}
+
 .danger-card {
   grid-column: 1 / -1;
 }
@@ -2720,6 +2771,42 @@ body.app-menu-open {
     border-bottom: 0;
   }
 
+  .dashboard-sidebar-controls {
+    display: flex;
+  }
+
+  .dashboard-sidebar-controls .icon-button,
+  .dashboard-sidebar-controls .hamburger-btn,
+  .dashboard-view-controls .icon-button,
+  .dashboard-view-controls .hamburger-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+
+  .dashboard-sidebar-controls .icon-button svg,
+  .dashboard-sidebar-controls .hamburger-btn svg,
+  .dashboard-view-controls .icon-button svg,
+  .dashboard-view-controls .hamburger-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .conversation-panel--centered .dashboard-view-controls,
+  .conversation-panel--empty .dashboard-view-controls {
+    top: 20px;
+    right: 20px;
+  }
+
+  .conversation-panel--settings {
+    padding: 20px;
+  }
+
+  .settings-page--embedded {
+    max-width: 100%;
+    padding: 0 0 24px;
+  }
+
   .mobile-back-button {
     display: inline-flex;
     align-items: center;
@@ -2728,6 +2815,18 @@ body.app-menu-open {
 
   .brand-mark-button {
     display: grid;
+  }
+
+  .conversation-sticky-controls .conversation-toolbar {
+    display: flex;
+  }
+
+  .conversation-toolbar--desktop {
+    display: none;
+  }
+
+  .conversation-header-actions:not(:has(.stats-row)) {
+    display: none;
   }
 
   .conversation-sticky-controls .hamburger-btn {

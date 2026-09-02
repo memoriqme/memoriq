@@ -150,7 +150,10 @@
           <div class="panel-header">
             <div class="panel-header-top">
               <app-brand />
-              <app-menu-button />
+              <div class="settings-header-actions dashboard-sidebar-controls">
+                <app-theme-button />
+                <app-menu-button />
+              </div>
             </div>
           </div>
           <div class="vault-sidebar-notice">
@@ -168,22 +171,28 @@
         <div class="panel-header">
           <div class="panel-header-top">
             <app-brand />
-            <app-menu-button />
+            <div class="settings-header-actions dashboard-sidebar-controls">
+              <app-theme-button />
+              <app-menu-button />
+            </div>
           </div>
         </div>
 
-        <extension-install-cta
-          v-if="showExtensionBanner"
-          class="dashboard-extension-banner"
-          variant="compact"
-          eyebrow="Get started"
-          title="Install the browser extension"
-          description="Save conversations from ChatGPT, Claude, Gemini, or Grok in one click."
-          show-connect
-          dismissible
-          @dismiss="dismissExtensionBanner"
-        />
+        <template v-if="showExtensionBanner">
+          <div class="dashboard-extension-spacer" aria-hidden="true"></div>
+          <extension-install-cta
+            class="dashboard-extension-banner"
+            variant="compact"
+            eyebrow="Get started"
+            title="Install the browser extension"
+            description="Save conversations from ChatGPT, Claude, Gemini, or Grok in one click."
+            show-connect
+            dismissible
+            @dismiss="dismissExtensionBanner"
+          />
+        </template>
 
+        <div v-if="conversations.length" class="panel-memory-spacer" aria-hidden="true"></div>
         <div class="panel-header-copy">
           <p class="eyebrow">Your AI Memory</p>
           <div class="stats-row panel-stats-row">
@@ -359,10 +368,22 @@
       </section>
 
       <section v-if="isSettingsRoute" class="conversation-panel conversation-panel--settings">
+        <div class="dashboard-view-controls">
+          <div class="settings-header-actions conversation-toolbar">
+            <app-theme-button />
+            <app-menu-button />
+          </div>
+        </div>
         <settings-panel embedded />
       </section>
 
       <section v-else-if="!encryption.configured" class="conversation-panel conversation-panel--centered">
+        <div class="dashboard-view-controls">
+          <div class="settings-header-actions conversation-toolbar">
+            <app-theme-button />
+            <app-menu-button />
+          </div>
+        </div>
         <div class="settings-card vault-card">
           <p class="eyebrow">Private by default</p>
           <h1>Set your Memoriq encryption password</h1>
@@ -395,6 +416,12 @@
       </section>
 
       <section v-else-if="!encryption.isUnlocked" class="conversation-panel conversation-panel--centered">
+        <div class="dashboard-view-controls">
+          <div class="settings-header-actions conversation-toolbar">
+            <app-theme-button />
+            <app-menu-button />
+          </div>
+        </div>
         <div class="settings-card vault-card">
           <p class="eyebrow">Vault locked</p>
           <h1>Unlock your Memoriq vault</h1>
@@ -478,7 +505,10 @@
           <button class="brand-mark-button" type="button" aria-label="Back to dashboard" @click="goToDashboardHome">
             <memoriq-logo />
           </button>
-          <app-menu-button />
+          <div class="settings-header-actions conversation-toolbar conversation-toolbar--mobile">
+            <app-theme-button />
+            <app-menu-button />
+          </div>
         </div>
 
         <template v-if="activeSearchQuery">
@@ -487,8 +517,14 @@
               <p class="eyebrow">Search</p>
               <h2>Search results</h2>
             </div>
-            <div class="stats-row">
-              <span>{{ searchResults.length }} {{ searchResults.length === 1 ? 'match' : 'matches' }}</span>
+            <div class="conversation-header-actions">
+              <div class="settings-header-actions conversation-toolbar conversation-toolbar--desktop">
+                <app-theme-button />
+                <app-menu-button />
+              </div>
+              <div class="stats-row">
+                <span>{{ searchResults.length }} {{ searchResults.length === 1 ? 'match' : 'matches' }}</span>
+              </div>
             </div>
           </header>
 
@@ -521,7 +557,7 @@
 
         <template v-else>
           <header class="conversation-header">
-            <div>
+            <div class="conversation-header-main">
               <div class="conversation-title-row">
                 <input
                   v-if="renamingId === selectedConversation.id"
@@ -551,11 +587,9 @@
                   </button>
                 </template>
               </div>
-            </div>
-            <div class="conversation-header-actions">
               <div class="meta-row">
                 <span class="badge" :class="'source-' + selectedConversation.source">{{ sourceLabel(selectedConversation.source) }}</span>
-                <span class="badge">{{ selectedConversation.project }}</span>
+                <span v-if="selectedConversation.project" class="badge">{{ selectedConversation.project }}</span>
                 <span class="badge">{{ formatDateFull(selectedConversation.archivedAt) }}</span>
                 <span class="badge">{{ formatBytes(selectedConversation.bodyBytes) }}</span>
                 <div class="conversation-export-menu" @click.stop>
@@ -601,6 +635,12 @@
                 </a>
               </div>
             </div>
+            <div class="conversation-header-actions">
+              <div class="settings-header-actions conversation-toolbar conversation-toolbar--desktop">
+                <app-theme-button />
+                <app-menu-button />
+              </div>
+            </div>
           </header>
 
           <div class="archived-banner">
@@ -638,6 +678,12 @@
       </section>
 
       <section v-else class="conversation-panel conversation-panel--empty">
+        <div class="dashboard-view-controls">
+          <div class="settings-header-actions conversation-toolbar">
+            <app-theme-button />
+            <app-menu-button />
+          </div>
+        </div>
         <div class="empty-card conversation-empty-state">
           Select a conversation from the sidebar, or search your saved chats.
         </div>
@@ -653,6 +699,7 @@ import { useRoute, useRouter } from 'vue-router';
 import AppBrand from '../components/AppBrand.vue';
 import MemoriqLogo from '../components/MemoriqLogo.vue';
 import AppMenuButton from '../components/AppMenuButton.vue';
+import AppThemeButton from '../components/AppThemeButton.vue';
 import MessageBody from '../components/MessageBody.vue';
 import SettingsPanel from '../components/SettingsPanel.vue';
 import ExtensionInstallCta from '../components/ExtensionInstallCta.vue';
@@ -744,7 +791,6 @@ const showExtensionBanner = computed(
   () =>
     encryption.configured
     && encryption.isUnlocked
-    && !isSettingsRoute.value
     && !conversationsLoading.value
     && conversations.value.length === 0
     && !extensionBannerDismissed.value,
