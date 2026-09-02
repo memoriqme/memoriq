@@ -170,14 +170,6 @@
             <app-brand />
             <app-menu-button />
           </div>
-          <div class="panel-header-copy">
-            <p class="eyebrow">Your AI Memory</p>
-            <div class="stats-row panel-stats-row">
-              <span>{{ pluralize(pagination.total || conversations.length, 'conversation', 'conversations') }}</span>
-              <span>{{ pluralize(projects.length, 'project', 'projects') }}</span>
-              <span>{{ pluralize(sources.length, 'source', 'sources') }}</span>
-            </div>
-          </div>
         </div>
 
         <extension-install-cta
@@ -192,22 +184,41 @@
           @dismiss="dismissExtensionBanner"
         />
 
-        <label class="search-field">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input v-model="searchQuery" type="search" placeholder="Search your saved chats..." />
-        </label>
-
-        <button class="button button-ghost paste-reply-button" type="button" @click="openPasteModal">
-          Paste AI reply
-        </button>
+        <div class="panel-header-copy">
+          <p class="eyebrow">Your AI Memory</p>
+          <div class="stats-row panel-stats-row">
+            <span>{{ pluralize(pagination.total || conversations.length, 'conversation', 'conversations') }}</span>
+            <span>{{ pluralize(projects.length, 'project', 'projects') }}</span>
+            <span>{{ pluralize(usedSourceCount, 'source', 'sources') }}</span>
+          </div>
+          <button class="button button-ghost paste-reply-button" type="button" @click="openPasteModal">
+            Paste AI reply
+          </button>
+        </div>
+        <div class="filter-block">
+          <p>Filter</p>
+          <label class="search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input v-model="searchQuery" type="search" placeholder="Search your saved chats..." />
+          </label>
+          <div class="chip-row">
+            <button v-for="source in sources" :key="source.id" class="chip source-chip" :class="{ active: activeSource === source.id }" type="button" @click="toggleSource(source.id)">
+              <span class="source-dot" :class="source.id"></span>
+              {{ source.label }}
+            </button>
+          </div>
+        </div>
 
         <div class="projects-block">
           <div class="projects-heading">
             <p>Projects</p>
             <button class="text-button project-new-button" type="button" @click="openCreateProjectModal">New</button>
           </div>
-          <div class="project-list">
-            <button class="project-item" :class="{ active: activeProject === NO_PROJECT }" type="button" @click="setProjectFilter(NO_PROJECT)">
+          <div
+            class="project-list"
+            :class="{ 'project-list--scrollable': hasMoreProjects }"
+          >
+            <button v-if="showNoProjectFilter" class="project-item" :class="{ active: activeProject === NO_PROJECT }" type="button" @click="setProjectFilter(NO_PROJECT)">
               <span class="project-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M5 5h14v14H5z"/>
@@ -217,10 +228,10 @@
                 </svg>
               </span>
               <span>Unsorted</span>
-              <small>{{ noProjectCount }}</small>
+              <small>{{ sidebarNoProjectCount }}</small>
             </button>
             <div
-              v-for="project in projects"
+              v-for="project in sidebarProjects"
               :key="project"
               class="project-item-row"
               :class="{ active: activeProject === project }"
@@ -232,7 +243,7 @@
                   </svg>
                 </span>
                 <span>{{ project }}</span>
-                <small>{{ projectCount(project) }}</small>
+                <small>{{ sidebarProjectCount(project) }}</small>
               </button>
               <div class="project-item-actions">
                 <button
@@ -265,23 +276,14 @@
           </div>
         </div>
 
-        <div class="filter-block">
-          <p>AI Sources</p>
-          <div class="chip-row">
-            <button v-for="source in sources" :key="source.id" class="chip source-chip" :class="{ active: activeSource === source.id }" type="button" @click="toggleSource(source.id)">
-              <span class="source-dot" :class="source.id"></span>
-              {{ source.label }}
-            </button>
-          </div>
-        </div>
-
         <button v-if="hasFilters" class="text-button clear-button" type="button" @click="clearFilters">Clear filters</button>
 
         <div v-if="deleteError" class="form-alert conversation-delete-alert">{{ deleteError }}</div>
 
+        <p class="conversations-heading" :class="{ 'conversations-heading--empty': !filteredConversations.length }">Conversations</p>
         <div class="conversation-list">
           <div
-            v-for="conversation in filteredConversations"
+            v-for="conversation in visibleConversations"
             :key="conversation.id"
             class="conversation-item-row"
             :class="{ active: selectedId === conversation.id }"
@@ -349,8 +351,8 @@
             </p>
           </div>
 
-          <button v-if="hasMoreConversations" class="button button-ghost load-more-button" type="button" :disabled="conversationsLoading" @click="loadMoreConversations">
-            {{ conversationsLoading ? 'Loading…' : 'Load more' }}
+          <button v-if="hasMoreVisibleConversations" class="button button-ghost load-more-button" type="button" :disabled="conversationsLoading" @click="loadMoreVisibleConversations">
+            {{ conversationsLoading ? 'Loading…' : 'Load More' }}
           </button>
         </div>
         </template>
@@ -671,6 +673,8 @@ const route = useRoute();
 const router = useRouter();
 const isSettingsRoute = computed(() => route.name === 'Settings');
 const NO_PROJECT = '__no_project__';
+const PROJECT_VISIBLE_LIMIT = 7;
+const CONVERSATION_VISIBLE_INCREMENT = 20;
 const conversations = ref([]);
 const conversationsLoading = ref(false);
 const bodyLoadingId = ref(null);
@@ -680,6 +684,7 @@ const focusMessageIndex = ref(null);
 const messageRefs = ref({});
 const activeProject = ref(NO_PROJECT);
 const activeSource = ref(null);
+const visibleConversationCount = ref(CONVERSATION_VISIBLE_INCREMENT);
 const selectedId = ref(null);
 const deletingId = ref(null);
 const movingId = ref(null);
@@ -731,6 +736,7 @@ let lastSyncCheckAt = 0;
 
 const projects = computed(() => [...new Set(conversations.value.map((conversation) => conversation.project).filter(Boolean))]);
 const noProjectCount = computed(() => conversations.value.filter((conversation) => !conversation.project).length);
+const usedSourceCount = computed(() => new Set(conversations.value.map((conversation) => conversation.source).filter(Boolean)).size);
 
 const hasFilters = computed(() => !!searchQuery.value.trim() || activeProject.value !== NO_PROJECT || activeSource.value);
 
@@ -761,11 +767,10 @@ const chipFilteredConversations = computed(() =>
 const activeSearchQuery = computed(() => searchQuery.value.trim());
 
 const searchResults = computed(() => collectSearchResults(sourceFilteredConversations.value, activeSearchQuery.value));
-
-const filteredConversations = computed(() => {
+const searchMatchedConversations = computed(() => {
   const q = activeSearchQuery.value.toLowerCase();
 
-  if (!q) return chipFilteredConversations.value;
+  if (!q) return sourceFilteredConversations.value;
 
   const matchingIds = new Set(searchResults.value.map((result) => result.conversationId));
 
@@ -773,9 +778,29 @@ const filteredConversations = computed(() => {
     (conversation) => matchingIds.has(conversation.id) || conversationHaystack(conversation).includes(q),
   );
 });
+const sidebarProjects = computed(() => {
+  if (!activeSearchQuery.value) return projects.value;
+
+  return [...new Set(searchMatchedConversations.value.map((conversation) => conversation.project).filter(Boolean))];
+});
+const sidebarNoProjectCount = computed(() => (
+  activeSearchQuery.value
+    ? searchMatchedConversations.value.filter((conversation) => !conversation.project).length
+    : noProjectCount.value
+));
+const showNoProjectFilter = computed(() => !activeSearchQuery.value || sidebarNoProjectCount.value > 0);
+const hasMoreProjects = computed(() => sidebarProjects.value.length > PROJECT_VISIBLE_LIMIT);
+
+const filteredConversations = computed(() => {
+  if (!activeSearchQuery.value) return chipFilteredConversations.value;
+
+  return searchMatchedConversations.value;
+});
 
 const selectedConversation = computed(() => conversations.value.find((conversation) => conversation.id === selectedId.value) || null);
 const hasMoreConversations = computed(() => pagination.currentPage < pagination.lastPage);
+const visibleConversations = computed(() => filteredConversations.value.slice(0, visibleConversationCount.value));
+const hasMoreVisibleConversations = computed(() => filteredConversations.value.length > visibleConversationCount.value);
 const projectModalTitle = computed(() => ({
   create: 'Create project',
   rename: 'Rename project',
@@ -803,6 +828,11 @@ watch(filteredConversations, (list) => {
   if (list.length && !list.some((conversation) => conversation.id === selectedId.value)) {
     selectedId.value = list[0].id;
   }
+});
+
+watch([activeSearchQuery, activeProject, activeSource], async () => {
+  visibleConversationCount.value = CONVERSATION_VISIBLE_INCREMENT;
+  await ensureConversationsForVisibleCount(visibleConversationCount.value + 1);
 });
 
 watch(selectedId, async () => {
@@ -1118,7 +1148,7 @@ async function startOverVault() {
 }
 
 async function loadConversations(page = 1, append = false, options = {}) {
-  const { silent = false } = options;
+  const { silent = false, ensureView = !append } = options;
   if (!silent) conversationsLoading.value = true;
 
   try {
@@ -1184,11 +1214,32 @@ async function loadConversations(page = 1, append = false, options = {}) {
   } finally {
     if (!silent) conversationsLoading.value = false;
   }
+
+  if (ensureView) {
+    await ensureConversationsForVisibleCount(visibleConversationCount.value + 1);
+  }
 }
 
 async function loadMoreConversations() {
   if (!hasMoreConversations.value || conversationsLoading.value) return;
-  await loadConversations(pagination.currentPage + 1, true);
+  await loadConversations(pagination.currentPage + 1, true, { ensureView: false });
+}
+
+async function loadMoreVisibleConversations() {
+  if (!hasMoreVisibleConversations.value || conversationsLoading.value) return;
+
+  visibleConversationCount.value += CONVERSATION_VISIBLE_INCREMENT;
+  await ensureConversationsForVisibleCount(visibleConversationCount.value + 1);
+}
+
+async function ensureConversationsForVisibleCount(count) {
+  while (
+    filteredConversations.value.length < count
+    && hasMoreConversations.value
+    && !conversationsLoading.value
+  ) {
+    await loadMoreConversations();
+  }
 }
 
 function isMobileDashboard() {
@@ -1404,6 +1455,11 @@ async function onVaultImported() {
 
 function projectCount(project) {
   return conversations.value.filter((conversation) => conversation.project === project).length;
+}
+
+function sidebarProjectCount(project) {
+  if (!activeSearchQuery.value) return projectCount(project);
+  return searchMatchedConversations.value.filter((conversation) => conversation.project === project).length;
 }
 
 function cleanProjectName(value) {
