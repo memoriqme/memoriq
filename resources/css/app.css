@@ -2481,6 +2481,19 @@ body.app-menu-open {
   margin-top: 22px;
 }
 
+.form-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .form-field-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 .project-form {
   display: grid;
   gap: 12px;

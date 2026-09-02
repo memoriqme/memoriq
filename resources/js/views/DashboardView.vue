@@ -34,7 +34,6 @@
     <div v-if="pasteModalOpen" class="modal-backdrop" role="presentation">
       <section class="paste-reply-modal" role="dialog" aria-modal="true" aria-labelledby="paste-reply-title">
         <memoriq-logo class="modal-mark" :size="48" />
-        <p class="eyebrow">Manual save</p>
         <h1 id="paste-reply-title">Paste an AI reply</h1>
         <p>
           Save a single assistant response as an encrypted Memoriq chat. Choose the source, paste the reply, and adjust the title if needed.
@@ -42,10 +41,36 @@
 
         <form class="paste-reply-form" @submit.prevent="savePastedReply">
           <label class="form-field">
-            AI source
-            <select v-model="pasteForm.source" required>
-              <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.label }}</option>
-            </select>
+            AI reply
+            <textarea
+              v-model="pasteForm.content"
+              class="paste-reply-textarea"
+              placeholder="Paste the AI reply here..."
+              required
+            ></textarea>
+          </label>
+
+          <div class="form-field-row">
+            <label class="form-field">
+              AI source
+              <select v-model="pasteForm.source" required>
+                <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.label }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              Project
+              <select v-model="pasteForm.project">
+                <option value="">Unsorted</option>
+                <option v-for="project in projects" :key="project" :value="project">{{ project }}</option>
+                <option value="__new__">Create new project...</option>
+              </select>
+            </label>
+          </div>
+
+          <label v-if="pasteForm.project === '__new__'" class="form-field">
+            New project name
+            <input v-model="pasteForm.newProject" type="text" maxlength="80" required />
           </label>
 
           <label class="form-field">
@@ -60,23 +85,13 @@
           </label>
 
           <label class="form-field">
-            Conversation URL (optional)
+            Conversation URL
             <input
               v-model="pasteForm.sourceUrl"
               type="url"
               inputmode="url"
               placeholder="https://chatgpt.com/..."
             />
-          </label>
-
-          <label class="form-field">
-            AI reply
-            <textarea
-              v-model="pasteForm.content"
-              class="paste-reply-textarea"
-              placeholder="Paste the AI reply here..."
-              required
-            ></textarea>
           </label>
 
           <div v-if="pasteError" class="form-alert">{{ pasteError }}</div>
@@ -99,11 +114,27 @@
         <h1 id="edit-conversation-title">Edit Conversation</h1>
 
         <form class="paste-reply-form" @submit.prevent="saveEditConversation">
-          <label class="form-field">
-            AI source
-            <select v-model="editModal.source" required>
-              <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.label }}</option>
-            </select>
+          <div class="form-field-row">
+            <label class="form-field">
+              AI source
+              <select v-model="editModal.source" required>
+                <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.label }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              Project
+              <select v-model="editModal.project">
+                <option value="">Unsorted</option>
+                <option v-for="project in projects" :key="project" :value="project">{{ project }}</option>
+                <option value="__new__">Create new project...</option>
+              </select>
+            </label>
+          </div>
+
+          <label v-if="editModal.project === '__new__'" class="form-field">
+            New project name
+            <input v-model="editModal.newProject" type="text" maxlength="80" required />
           </label>
 
           <label class="form-field">
@@ -117,7 +148,7 @@
           </label>
 
           <label class="form-field">
-            Conversation URL (optional)
+            Conversation URL
             <input
               v-model="editModal.sourceUrl"
               type="url"
@@ -781,13 +812,15 @@ const pasteModalOpen = ref(false);
 const pasteSaving = ref(false);
 const pasteError = ref('');
 const pasteTitleTouched = ref(false);
-const pasteForm = reactive({ source: 'chatgpt', title: '', content: '', sourceUrl: '' });
+const pasteForm = reactive({ source: 'chatgpt', title: '', content: '', sourceUrl: '', project: '', newProject: '' });
 const editModal = reactive({
   open: false,
   conversation: null,
   title: '',
   source: '',
   sourceUrl: '',
+  project: '',
+  newProject: '',
   error: '',
 });
 const projectModal = reactive({
@@ -1555,6 +1588,11 @@ function cleanProjectName(value) {
   return (value || '').trim().replace(/\s+/g, ' ').slice(0, 80);
 }
 
+function resolveSelectedProject(targetProject, newName) {
+  if (targetProject === '__new__') return cleanProjectName(newName);
+  return cleanProjectName(targetProject) || null;
+}
+
 function cleanTitle(value) {
   return (value || '').trim().replace(/\s+/g, ' ').slice(0, 200);
 }
@@ -1626,7 +1664,7 @@ function buildManualConversationPayload() {
       title,
       sourceUrl,
       capturedAt,
-      project: null,
+      project: resolveSelectedProject(pasteForm.project, pasteForm.newProject),
       tags: [],
       messageCount: 1,
       snippet: truncate(plainTextFromMarkdown(content), 280),
@@ -1648,6 +1686,8 @@ function openPasteModal() {
   pasteError.value = '';
   pasteTitleTouched.value = false;
   if (!pasteForm.source) pasteForm.source = sources[0]?.id || 'chatgpt';
+  pasteForm.project = activeProject.value !== NO_PROJECT ? activeProject.value : '';
+  pasteForm.newProject = '';
   nextTick(() => document.querySelector('.paste-reply-textarea')?.focus());
 }
 
@@ -1663,6 +1703,8 @@ function resetPasteForm() {
   pasteForm.title = '';
   pasteForm.content = '';
   pasteForm.sourceUrl = '';
+  pasteForm.project = '';
+  pasteForm.newProject = '';
   pasteTitleTouched.value = false;
 }
 
@@ -1672,6 +1714,8 @@ function resetEditConversationModal() {
   editModal.title = '';
   editModal.source = '';
   editModal.sourceUrl = '';
+  editModal.project = '';
+  editModal.newProject = '';
   editModal.error = '';
 }
 
@@ -1683,6 +1727,8 @@ function openEditConversationModal(conversation) {
   editModal.title = conversation.title || '';
   editModal.source = conversation.source || sources[0]?.id || 'chatgpt';
   editModal.sourceUrl = conversation.header?.sourceUrl || '';
+  editModal.project = conversation.project || '';
+  editModal.newProject = '';
   editModal.error = '';
 }
 
@@ -1704,6 +1750,11 @@ async function savePastedReply() {
     return;
   }
 
+  if (pasteForm.project === '__new__' && !cleanProjectName(pasteForm.newProject)) {
+    pasteError.value = 'Enter a project name.';
+    return;
+  }
+
   pasteSaving.value = true;
 
   try {
@@ -1720,7 +1771,7 @@ async function savePastedReply() {
       title: payload.header.title,
       source: payload.header.provider,
       archivedAt: data.created_at?.slice(0, 10) || payload.header.capturedAt.slice(0, 10),
-      project: null,
+      project: payload.header.project || null,
       tags: payload.header.tags,
       messageCount: 1,
       snippet: payload.header.snippet,
@@ -1736,6 +1787,7 @@ async function savePastedReply() {
     conversations.value = [conversation, ...conversations.value];
     pagination.total += 1;
     selectedId.value = conversation.id;
+    activeProject.value = conversation.project || NO_PROJECT;
     pasteModalOpen.value = false;
     resetPasteForm();
     await refreshSyncSnapshot();
@@ -1767,14 +1819,25 @@ async function saveEditConversation() {
     return;
   }
 
+  if (editModal.project === '__new__' && !cleanProjectName(editModal.newProject)) {
+    editModal.error = 'Enter a project name.';
+    return;
+  }
+
+  const project = resolveSelectedProject(editModal.project, editModal.newProject);
   const updated = await updateConversationHeader(conversation, {
     title,
     provider: editModal.source,
     sourceUrl,
+    project,
   });
 
-  if (updated) resetEditConversationModal();
-  else editModal.error = deleteError.value || 'Unable to update this conversation.';
+  if (updated) {
+    activeProject.value = project || NO_PROJECT;
+    resetEditConversationModal();
+  } else {
+    editModal.error = deleteError.value || 'Unable to update this conversation.';
+  }
 }
 
 function buildConversationHeader(conversation, overrides = {}) {
