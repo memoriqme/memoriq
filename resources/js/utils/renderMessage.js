@@ -14,7 +14,7 @@ function flattenContent(content) {
 }
 
 function escapeHtml(text) {
-  return text
+  return String(text || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -33,7 +33,8 @@ function plainTextToHtml(text) {
 
 function looksLikeMarkdown(text) {
   if (!text || typeof text !== 'string') return false;
-  return /(^|\n)(#{1,6}\s|[-*+]\s|\d+\.\s|```|>\s|\|.+\|)/m.test(text);
+  return /(^|\n)(#{1,6}\s|[-*+]\s|\d+\.\s|```|>\s|\|.+\|)/m.test(text)
+    || /(^|[\s(])(\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|_[^_\n]+_|`[^`\n]+`|~~[^~\n]+~~|\[[^\]]+]\([^)]+\))/.test(text);
 }
 
 function isArtifactLabelText(text) {
