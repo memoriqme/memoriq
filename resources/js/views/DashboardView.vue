@@ -93,6 +93,53 @@
       </section>
     </div>
 
+    <div v-if="editModal.open" class="modal-backdrop" role="presentation">
+      <section class="paste-reply-modal" role="dialog" aria-modal="true" aria-labelledby="edit-conversation-title">
+        <memoriq-logo class="modal-mark" :size="48" />
+        <h1 id="edit-conversation-title">Edit Conversation</h1>
+
+        <form class="paste-reply-form" @submit.prevent="saveEditConversation">
+          <label class="form-field">
+            AI source
+            <select v-model="editModal.source" required>
+              <option v-for="source in sources" :key="source.id" :value="source.id">{{ source.label }}</option>
+            </select>
+          </label>
+
+          <label class="form-field">
+            Title
+            <input
+              v-model="editModal.title"
+              type="text"
+              maxlength="200"
+              required
+            />
+          </label>
+
+          <label class="form-field">
+            Conversation URL (optional)
+            <input
+              v-model="editModal.sourceUrl"
+              type="url"
+              inputmode="url"
+              placeholder="https://chatgpt.com/..."
+            />
+          </label>
+
+          <div v-if="editModal.error" class="form-alert">{{ editModal.error }}</div>
+
+          <div class="modal-actions">
+            <button class="button button-primary" type="submit" :disabled="!!movingId">
+              {{ movingId === editModal.conversation?.id ? 'Saving...' : 'Save changes' }}
+            </button>
+            <button class="button button-ghost" type="button" :disabled="!!movingId" @click="closeEditConversationModal">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
     <div v-if="projectModal.open" class="modal-backdrop" role="presentation">
       <section class="project-modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
         <div class="modal-mark">
@@ -559,39 +606,25 @@
           <header class="conversation-header">
             <div class="conversation-header-main">
               <div class="conversation-title-row">
-                <input
-                  v-if="renamingId === selectedConversation.id"
-                  ref="titleInputRef"
-                  v-model="titleDraft"
-                  class="conversation-title-input"
-                  type="text"
-                  maxlength="200"
-                  aria-label="Chat title"
-                  @keydown.enter.prevent="saveTitleRename(selectedConversation)"
-                  @keydown.esc.prevent="cancelTitleRename"
-                  @blur="saveTitleRename(selectedConversation)"
-                />
-                <template v-else>
-                  <h2>{{ selectedConversation.title }}</h2>
-                  <button
-                    class="conversation-title-edit"
-                    type="button"
-                    title="Rename chat"
-                    aria-label="Rename chat"
-                    :disabled="!!movingId"
-                    @click="startTitleRename(selectedConversation)"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-                    </svg>
-                  </button>
-                </template>
+                <h2>{{ selectedConversation.title }}</h2>
               </div>
               <div class="meta-row">
                 <span class="badge" :class="'source-' + selectedConversation.source">{{ sourceLabel(selectedConversation.source) }}</span>
                 <span v-if="selectedConversation.project" class="badge">{{ selectedConversation.project }}</span>
                 <span class="badge">{{ formatDateFull(selectedConversation.archivedAt) }}</span>
                 <span class="badge">{{ formatBytes(selectedConversation.bodyBytes) }}</span>
+                <button
+                  class="conversation-header-icon"
+                  type="button"
+                  title="Edit conversation"
+                  aria-label="Edit conversation"
+                  :disabled="!!movingId"
+                  @click="openEditConversationModal(selectedConversation)"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                  </svg>
+                </button>
                 <div class="conversation-export-menu" @click.stop>
                   <button
                     class="conversation-header-icon"
@@ -738,9 +771,6 @@ const movingId = ref(null);
 const exportingId = ref(null);
 const exportMenuOpenId = ref(null);
 const projectUpdating = ref(null);
-const renamingId = ref(null);
-const titleDraft = ref('');
-const titleInputRef = ref(null);
 const deleteError = ref('');
 const exportError = ref('');
 const pasteModalOpen = ref(false);
@@ -748,6 +778,14 @@ const pasteSaving = ref(false);
 const pasteError = ref('');
 const pasteTitleTouched = ref(false);
 const pasteForm = reactive({ source: 'chatgpt', title: '', content: '', sourceUrl: '' });
+const editModal = reactive({
+  open: false,
+  conversation: null,
+  title: '',
+  source: '',
+  sourceUrl: '',
+  error: '',
+});
 const projectModal = reactive({
   open: false,
   mode: '',
@@ -882,7 +920,7 @@ watch([activeSearchQuery, activeProject, activeSource], async () => {
 });
 
 watch(selectedId, async () => {
-  cancelTitleRename();
+  if (editModal.open && !movingId.value) resetEditConversationModal();
   messageRefs.value = {};
   exportError.value = '';
   exportMenuOpenId.value = null;
@@ -1623,6 +1661,31 @@ function resetPasteForm() {
   pasteTitleTouched.value = false;
 }
 
+function resetEditConversationModal() {
+  editModal.open = false;
+  editModal.conversation = null;
+  editModal.title = '';
+  editModal.source = '';
+  editModal.sourceUrl = '';
+  editModal.error = '';
+}
+
+function openEditConversationModal(conversation) {
+  if (!conversation || movingId.value) return;
+
+  editModal.open = true;
+  editModal.conversation = conversation;
+  editModal.title = conversation.title || '';
+  editModal.source = conversation.source || sources[0]?.id || 'chatgpt';
+  editModal.sourceUrl = conversation.header?.sourceUrl || '';
+  editModal.error = '';
+}
+
+function closeEditConversationModal() {
+  if (movingId.value) return;
+  resetEditConversationModal();
+}
+
 async function savePastedReply() {
   pasteError.value = '';
 
@@ -1676,6 +1739,37 @@ async function savePastedReply() {
   } finally {
     pasteSaving.value = false;
   }
+}
+
+async function saveEditConversation() {
+  const conversation = editModal.conversation;
+  editModal.error = '';
+
+  if (!conversation) {
+    editModal.error = 'Select a conversation first.';
+    return;
+  }
+
+  const title = cleanTitle(editModal.title);
+  if (!title) {
+    editModal.error = 'Enter a title.';
+    return;
+  }
+
+  const sourceUrl = editModal.sourceUrl.trim() ? safeExternalUrl(editModal.sourceUrl) : '';
+  if (editModal.sourceUrl.trim() && !sourceUrl) {
+    editModal.error = 'Enter a valid http(s) conversation URL, or leave it blank.';
+    return;
+  }
+
+  const updated = await updateConversationHeader(conversation, {
+    title,
+    provider: editModal.source,
+    sourceUrl,
+  });
+
+  if (updated) resetEditConversationModal();
+  else editModal.error = deleteError.value || 'Unable to update this conversation.';
 }
 
 function buildConversationHeader(conversation, overrides = {}) {
@@ -1857,32 +1951,6 @@ async function confirmProjectModal() {
     await moveConversationToProject(projectModal.conversation, project || null);
     resetProjectModal();
   }
-}
-
-function startTitleRename(conversation) {
-  if (!conversation || movingId.value) return;
-
-  renamingId.value = conversation.id;
-  titleDraft.value = conversation.title || '';
-  nextTick(() => titleInputRef.value?.focus());
-}
-
-function cancelTitleRename() {
-  renamingId.value = null;
-  titleDraft.value = '';
-}
-
-async function saveTitleRename(conversation) {
-  if (!conversation || renamingId.value !== conversation.id) return;
-
-  const newTitle = cleanTitle(titleDraft.value);
-  const previousTitle = conversation.title;
-  renamingId.value = null;
-  titleDraft.value = '';
-
-  if (!newTitle || newTitle === previousTitle) return;
-
-  await updateConversationHeader(conversation, { title: newTitle });
 }
 
 async function moveConversationToProject(conversation, project) {

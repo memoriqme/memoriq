@@ -196,7 +196,6 @@ a {
 [data-theme="light"] .hamburger-btn,
 [data-theme="light"] .mobile-back-button,
 [data-theme="light"] .sidebar-logout-btn,
-[data-theme="light"] .conversation-title-edit,
 [data-theme="light"] .conversation-header-icon {
   border-color: #d0d0d0;
   background: #ffffff;
@@ -208,7 +207,6 @@ a {
 [data-theme="light"] .hamburger-btn:hover,
 [data-theme="light"] .mobile-back-button:hover,
 [data-theme="light"] .sidebar-logout-btn:hover:not(:disabled),
-[data-theme="light"] .conversation-title-edit:hover:not(:disabled),
 [data-theme="light"] .conversation-header-icon:hover:not(:disabled) {
   border-color: #b8b8b8;
   background: #eeeeee;
@@ -1368,59 +1366,6 @@ body.app-menu-open {
 
 .conversation-header-main .meta-row {
   justify-content: flex-start;
-}
-
-.conversation-title-input {
-  width: min(100%, 520px);
-  border: 1px solid var(--accent-border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text);
-  padding: 8px 12px;
-  font: inherit;
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-}
-
-.conversation-title-input:focus {
-  outline: 2px solid rgba(16, 163, 127, 0.35);
-  outline-offset: 1px;
-}
-
-.conversation-title-edit {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  margin-top: 4px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text-muted);
-  opacity: 0;
-  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-}
-
-.conversation-header:hover .conversation-title-edit,
-.conversation-title-edit:focus-visible {
-  opacity: 1;
-}
-
-.conversation-title-edit:hover:not(:disabled) {
-  background: var(--bg-elevated);
-  color: var(--text);
-}
-
-.conversation-title-edit:disabled {
-    cursor: default;
-  opacity: 0.5;
-}
-
-.conversation-title-edit svg {
-  width: 15px;
-  height: 15px;
 }
 
 .conversation-header-actions {
