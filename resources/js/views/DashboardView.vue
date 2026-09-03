@@ -866,17 +866,18 @@ const searchMatchedConversations = computed(() => {
     (conversation) => matchingIds.has(conversation.id) || conversationHaystack(conversation).includes(q),
   );
 });
+const sidebarIsFiltered = computed(() => !!activeSearchQuery.value || !!activeSource.value);
 const sidebarProjects = computed(() => {
-  if (!activeSearchQuery.value) return projects.value;
+  if (!sidebarIsFiltered.value) return projects.value;
 
   return [...new Set(searchMatchedConversations.value.map((conversation) => conversation.project).filter(Boolean))];
 });
 const sidebarNoProjectCount = computed(() => (
-  activeSearchQuery.value
+  sidebarIsFiltered.value
     ? searchMatchedConversations.value.filter((conversation) => !conversation.project).length
     : noProjectCount.value
 ));
-const showNoProjectFilter = computed(() => !activeSearchQuery.value || sidebarNoProjectCount.value > 0);
+const showNoProjectFilter = computed(() => !sidebarIsFiltered.value || sidebarNoProjectCount.value > 0);
 const hasMoreProjects = computed(() => sidebarProjects.value.length > PROJECT_VISIBLE_LIMIT);
 
 const filteredConversations = computed(() => {
@@ -1546,7 +1547,7 @@ function projectCount(project) {
 }
 
 function sidebarProjectCount(project) {
-  if (!activeSearchQuery.value) return projectCount(project);
+  if (!sidebarIsFiltered.value) return projectCount(project);
   return searchMatchedConversations.value.filter((conversation) => conversation.project === project).length;
 }
 
@@ -1958,15 +1959,30 @@ async function confirmProjectModal() {
 }
 
 async function moveConversationToProject(conversation, project) {
-  const updated = await updateConversationHeader(conversation, { project });
-  if (updated) {
-    activeProject.value = conversation.project || NO_PROJECT;
-  }
+  await updateConversationHeader(conversation, { project });
 }
 
 function toggleSource(source) {
   activeSource.value = activeSource.value === source ? null : source;
+  ensureActiveProjectIsVisible();
   clearMobileSelection();
+}
+
+function ensureActiveProjectIsVisible() {
+  const projectStillVisible = activeProject.value === NO_PROJECT
+    ? showNoProjectFilter.value
+    : sidebarProjects.value.includes(activeProject.value);
+
+  if (projectStillVisible) return;
+
+  if (showNoProjectFilter.value) {
+    activeProject.value = NO_PROJECT;
+    return;
+  }
+
+  if (sidebarProjects.value.length) {
+    activeProject.value = sidebarProjects.value[0];
+  }
 }
 
 function clearFilters() {
